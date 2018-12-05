@@ -11,7 +11,7 @@ class PriceParser:
         payload = payload['data']
         payload = payload.get('price_overview', None)
         if payload is None or len(payload) == 0:
-            return {}
+            return None
 
         return {
             'region': region,

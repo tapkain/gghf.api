@@ -31,10 +31,8 @@ def fetch_prices(apps, regions=supported_regions, delay=delay):
         # TODO: there could be an edge case then we are fetching price for more than 100 apps
         price_url = 'https://store.steampowered.com/api/appdetails?appids={0}&cc={1}&filters=price_overview'.format(
                 appids, region)
-        print(price_url)
-        print('Fetching price for {0} region'.format(region))
+        print('GET', price_url)
         price = requests.get(price_url).json()
-        print(price)
         price['region'] = region
         prices.append(price)
         steam.sleep(15)
