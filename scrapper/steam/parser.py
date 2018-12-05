@@ -6,7 +6,7 @@ class GameParser:
     @staticmethod
     def from_steam(payload, appid):
         payload = payload[str(appid)]
-        
+
         if not payload['success']:
             return None
 
@@ -86,7 +86,7 @@ class GameParser:
 
         return attachments
 
-    @staticmethod 
+    @staticmethod
     def platforms_from_steam(payload):
         result = []
 
@@ -117,4 +117,3 @@ class GameParser:
             'name': name,
             'requirement_minimum': req
         }
-

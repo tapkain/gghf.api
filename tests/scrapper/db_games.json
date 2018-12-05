@@ -1,4 +1,14 @@
 {
+   "price_latest": [
+      {
+         "store": "steam",
+         "region": "ua",
+         "initial": 22900,
+         "final": 22900,
+         "discount": 0,
+         "currency": "UAH"
+      }
+   ],
     "appid": 730,
     "name": "Counter-Strike: Global Offensive",
     "type": "game",

@@ -1,10 +1,11 @@
 from datetime import datetime
 
+
 class PriceParser:
     @staticmethod
     def from_steam(payload, appid):
         region = payload['region']
-        payload = payload.get(appid, None)
+        payload = payload.get(str(appid), None)
         if payload is None or not payload['success']:
             return None
 
@@ -22,4 +23,3 @@ class PriceParser:
             'final': payload['final'],
             'discount': payload['discount_percent']
         }
-        
