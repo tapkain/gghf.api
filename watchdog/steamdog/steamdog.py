@@ -1,8 +1,6 @@
 # watchdog for steam, uses steam PICS update API
 # when app has received updates, fetch price and news for the app
 
-from gevent import monkey
-monkey.patch_all()
 from watchdog.steamdog.parser import PriceParser
 from pymongo import UpdateOne
 import requests

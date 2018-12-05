@@ -3,10 +3,24 @@ import json
 import time
 from scrapper.steam import GameParser
 import datetime
-from pymongo import MongoClient
+from pymongo import MongoClient, UpdateOne
 from watchdog.steamdog.parser import PriceParser
+from config import Config
 
-mongo = MongoClient()
+mongo = MongoClient(Config.MONGODB_URI)
+db_name = Config.MONGODB_DATABASE
+
+
+def make_update_operation(game, price):
+    game['price_latest'] = {'steam': [price]}
+    return UpdateOne({'appid': game['appid']}, {'$set': game}, upsert=True)
+
+
+def bulk_update(updates):
+    try:
+        mongo[db_name].desktop_games.bulk_write(updates)
+    except Exception as ex:
+        print('Bulk update error', ex)
 
 
 def parse_game(game, appid):
@@ -35,11 +49,16 @@ def scrap(all_games):
         url = 'https://store.steampowered.com/api/appdetails?appids={0}&cc=us'.format(
             appid)
         fetched = requests.get(url).text
+        print('Fetched', appid)
         game, price = parse_game(fetched, appid)
+        print('Parsed', appid)
 
         if game is None:
             continue
 
+        # TODO: fetch games by chunks of 200 and make real bulk update
+        bulk_update([make_update_operation(game, price)])
+        print('Updated', appid)
         time.sleep(delay)
 
 

@@ -1,5 +1,7 @@
+from gevent import monkey
+monkey.patch_all()
 import watchdog.steamdog
 import threading
 
-if __name__ == '__main__':
-    watchdog.steamdog.main()
+print('ZALYPA')
+#watchdog.steamdog.main()
