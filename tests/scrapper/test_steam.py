@@ -12,3 +12,7 @@ def test_parse_game():
             assert db_games['name'] == parsed['name']
             assert db_games['description'] == parsed['description']
             assert len(db_games['developers']) == len(parsed['developers'])
+
+def test_parse_game_exception():
+    except_situation = parse_game('{bla bla}, 730', 730)
+    assert except_situation is None

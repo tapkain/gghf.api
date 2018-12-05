@@ -182,4 +182,6 @@ dmypy.json
 ### Python Patch ###
 .venv/
 
+*_steam_info.txt
+
 # End of https://www.gitignore.io/api/code,flask,python

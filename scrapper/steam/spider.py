@@ -2,14 +2,20 @@ import requests
 import json
 import time
 from scrapper.steam import GameParser
+import datetime
 
 def parse_game(game, appid):
     try:
-        game = json.loads(game)
-        game = GameParser.from_steam(game, appid)
-        return game
+        parsed = json.loads(game)
+        parsed = GameParser.from_steam(parsed, appid)
+        return parsed
     except Exception as ex:
-        print(ex)
+        now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        error_filename = '{0}_steam_info.txt'.format(now)
+        with open(error_filename, 'w') as f:
+                f.write(str(appid))
+                f.write('\n')
+                f.write(game)
         return None
 
 def scrap(all_games):
