@@ -183,5 +183,6 @@ dmypy.json
 .venv/
 
 *_steam_info.txt
+gghf.pem
 
 # End of https://www.gitignore.io/api/code,flask,python

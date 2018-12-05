@@ -5,7 +5,7 @@ import json
 def test_parse_game():
     with open('tests/scrapper/steam_games.json', 'r') as f:
         payload = f.read()
-        game, price = parse_game(payload, 730)
+        game = parse_game(payload, 730)
 
         with open('tests/scrapper/db_games.json', 'r') as db:
             db_games = json.loads(db.read())
@@ -13,9 +13,8 @@ def test_parse_game():
             assert db_games['name'] == game['name']
             assert db_games['description'] == game['description']
             assert len(db_games['developers']) == len(game['developers'])
-            assert db_games['price_latest'][0]['initial'] == price['initial']
 
 
 def test_parse_game_exception():
-    except_situation, _ = parse_game('{bla bla}, 730', 730)
+    except_situation = parse_game('{bla bla}, 730', 730)
     assert except_situation is None
