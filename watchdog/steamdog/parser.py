@@ -10,10 +10,10 @@ class PriceParser:
             return None
 
         payload = payload['data']
-        payload = payload.get('price_overview', None)
         if payload is None or len(payload) == 0:
             return None
 
+        payload = payload.get('price_overview', None)
         return {
             'region': region,
             'store': 'steam',

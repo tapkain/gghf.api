@@ -5,21 +5,21 @@ import time
 class GameParser:
     @staticmethod
     def from_steam(payload, appid):
-        payload = payload[str(appid)]
+        payload = payload[appid]
 
         if not payload['success']:
             return None
 
         payload = payload['data']
         return {
-            'appid': appid,
-            'name': payload['name'],
-            'type': payload['type'],
-            'description': payload['detailed_description'],
-            'header_image': payload['header_image'],
-            'website': payload['website'],
-            'developers': payload['developers'],
-            'publishers': payload['publishers'],
+            'appid': int(appid),
+            'name': payload.get('name', ''),
+            'type': payload.get('type', ''),
+            'description': payload.get('detailed_description', None),
+            'header_image': payload.get('header_image', None),
+            'website': payload.get('website', None),
+            'developers': payload.get('developers', None),
+            'publishers': payload.get('publishers', None),
             'platforms': GameParser.platforms_from_steam(payload),
             'categories': GameParser.categories_from_steam(payload),
             'tags': GameParser.tags_from_steam(payload),

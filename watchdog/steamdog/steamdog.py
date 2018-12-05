@@ -23,7 +23,7 @@ supported_regions = [
 # fetch prices for all apps from supported regions
 def fetch_prices(apps, regions=supported_regions, delay=delay):
     prices = []
-    appids = ','.join(list(map(lambda x: str(x.appid), apps)))
+    appids = ','.join(apps)
     print('Apps to change -', appids)
 
     for region in regions:
@@ -34,7 +34,7 @@ def fetch_prices(apps, regions=supported_regions, delay=delay):
         price = requests.get(price_url).json()
         price['region'] = region
         prices.append(price)
-        steam.sleep(15)
+        steam.sleep(delay)
 
     return prices
 
@@ -44,8 +44,8 @@ def parse_prices(prices, apps):
     parsed = []
 
     for region_price in prices:
-        for app in apps:
-            price = PriceParser.from_steam(region_price, str(app.appid))
+        for appid in apps:
+            price = PriceParser.from_steam(region_price, appid)
             if price is not None:
                 parsed.append(price)
 
@@ -64,8 +64,9 @@ def main(change_number=0):
         payload = steam.get_changes_since(current_change_number)
 
         if len(payload.app_changes) != 0:
-            prices = fetch_prices(payload.app_changes)
-            updates = make_price_updates(prices, payload.app_changes)
+            apps = list(map(lambda x: str(x.appid), payload.app_changes))
+            prices = fetch_prices(apps)
+            updates = make_price_updates(prices, apps)
 
         current_change_number = payload.current_change_number
         print('Change number: ', current_change_number)

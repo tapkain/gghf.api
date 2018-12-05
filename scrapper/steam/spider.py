@@ -4,7 +4,7 @@ import time
 from scrapper.steam import GameParser
 import datetime
 from pymongo import MongoClient, UpdateOne
-from watchdog.steamdog import parse_prices, fetch_prices
+import watchdog.steamdog
 from config import Config
 
 mongo = MongoClient(Config.MONGODB_URI)
@@ -25,16 +25,15 @@ def bulk_update(updates):
 
 def parse_game(game, appid):
     try:
-        parsed = json.loads(game)
-        parsed = GameParser.from_steam(parsed, appid)
-        return parsed
+        return GameParser.from_steam(game, appid)
     except Exception as ex:
         now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         error_filename = '{0}_steam_info.txt'.format(now)
         with open(error_filename, 'w') as f:
-            f.write(str(appid))
+            f.write(appid)
             f.write('\n')
             f.write(game)
+            f.flush()
         return None
 
 
@@ -43,24 +42,39 @@ def scrap(all_games):
     delay = 15
 
     for game in all_games:
-        appid = game['appid']
+        appid = str(game['appid'])
         url = 'https://store.steampowered.com/api/appdetails?appids={0}&cc=us'.format(
             appid)
-        fetched = requests.get(url).text
+        fetched = requests.get(url).json()
         print('Fetched', appid)
         game = parse_game(fetched, appid)
         print('Parsed', appid)
-        print('Fetching prices for', appid)
-        prices = watchdog.steamdog.fetch_prices([appid])
-        prices = watchdog.steamdog.parse_prices(prices, [appid])
 
         if game is None:
+            time.sleep(delay)
+            print('Game could not be parsed, look in the error logs', appid)
             continue
+
+        if game['type'] != 'game' and game['type'] != 'dlc':
+            print('Is not game neither dlc,', appid)
+            time.sleep(delay)
+            continue
+
+        if fetched[appid]['data'].get('price_overview', None) is None:
+            print('App probably is free, skipping price fetch', appid)
+            bulk_update([make_update_operation(game, prices)])
+            print('Updated', appid)
+            time.sleep(delay)
+            continue
+
+        print('Fetching prices for', appid)
+        time.sleep(delay)
+        prices = watchdog.steamdog.fetch_prices([appid])
+        prices = watchdog.steamdog.parse_prices(prices, [appid])
 
         # TODO: fetch games by chunks of 200 and make real bulk update
         bulk_update([make_update_operation(game, prices)])
         print('Updated', appid)
-        time.sleep(delay)
 
 
 def main():

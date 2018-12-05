@@ -2,13 +2,8 @@ import watchdog.steamdog
 import json
 
 
-class TestApp:
-    def __init__(self, appid):
-        self.appid = appid
-
-
 prices = None
-test_app_changes = [TestApp(730), TestApp(65540)]
+test_app_changes = ['730', '65540']
 test_regions = ['US', 'AR']
 
 

@@ -5,6 +5,8 @@ import json
 def test_parse_game():
     with open('tests/scrapper/steam_games.json', 'r') as f:
         payload = f.read()
+        game = parse_game(payload, 558620)
+        assert game is not None
         game = parse_game(payload, 730)
 
         with open('tests/scrapper/db_games.json', 'r') as db:
