@@ -8,7 +8,7 @@ class GameParser:
         payload = payload[str(appid)]
 
         if not payload['success']:
-            return None
+            return False
 
         payload = payload['data']
         return {
@@ -108,12 +108,14 @@ class GameParser:
         if not data['platforms'][name]:
             return None
 
-        if type(data[req_name]) is list:
-            req = None
-        else:
-            req = data[req_name]['minimum']
+        minimum = None
+        recommended = None
+        if type(data[req_name]) is not list:
+            minimum = data[req_name].get('minimum', None)
+            recommended = data[req_name].get('recommended', None)
 
         return {
             'name': name,
-            'requirement_minimum': req
+            'requirement_minimum': minimum,
+            'requirement_recommended': recommended 
         }

@@ -32,7 +32,11 @@ def parse_game(game, appid):
         with open(error_filename, 'w') as f:
             f.write(str(appid))
             f.write('\n')
-            f.write(game)
+            try:
+                f.write(json.dumps(game))
+            except Exception as ex:
+                f.write('Cannot parse game\n')
+                f.write(ex)
             f.flush()
         return None
 
@@ -60,9 +64,15 @@ def fetch_games_info(chunk, delay):
             print('Game could not be parsed, look in the error logs', appid)
             continue
 
+        # the game 'success' flag from steam is false
+        if not game:
+            time.sleep(delay)
+            print('Steam returned success=False ', appid)
+            continue
+
         # gghf supports only games and dlc's for now
         if game['type'] != 'game' and game['type'] != 'dlc':
-            print('Is not game neither dlc,', appid)
+            print('Is not game neither dlc, type is', game['type'])
             time.sleep(delay)
             continue
 
@@ -74,33 +84,35 @@ def fetch_games_info(chunk, delay):
             time.sleep(delay)
             continue
 
-        # if game was parsed and has price, add it to the appids_prices
+        # if game was parsed and has price, add it to the games_prices
         # to fetch all prices in batch later
-        appids_prices.append(appid)
+        games_prices.append(game)
+        time.sleep(delay)
 
-    return appids_prices, update_operations
+    return games_prices, update_operations
 
 
 def scrap(all_games):
     # steam allows 200 request per 5 minutes, so delay 15 min between requests
     delay = 15
     # price overview appids count is max 100, so make an restriction
-    rate_limit = 100
+    rate_limit = 1
 
     for chunk in make_chunk(all_games, rate_limit):
-        appids_prices, update_operations = fetch_games_info(chunk, delay)
+        games_prices, update_operations = fetch_games_info(chunk, delay)
 
         print('Fetching prices for appids')
-        prices = watchdog.steamdog.fetch_prices(appids_prices)
-        prices = watchdog.steamdog.parse_prices(prices, appids_prices)
+        appids = list(map(lambda x: str(x['appid']), games_prices))
+        prices = watchdog.steamdog.fetch_prices(appids)
+        prices = watchdog.steamdog.parse_prices(prices, appids)
 
         # add the fetched price to model
         for game in games_prices:
-            operation = make_update_operation(game, prices[game['appid']])
+            operation = make_update_operation(game, prices[str(game['appid'])])
             update_operations.append(operation)
 
         bulk_update(update_operations)
-        print('Updated', appids)
+        print('Updated chunk')
 
 
 def main():
