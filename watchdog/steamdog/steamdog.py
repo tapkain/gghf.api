@@ -20,9 +20,14 @@ supported_regions = [
 ]
 
 
-# fetch prices for all apps from supported regions
 def fetch_prices(apps, regions=supported_regions, delay=delay):
+    # fetch prices for all apps from supported regions
     prices = []
+
+    if len(apps) == 0:
+        print('No apps to fetch price for')
+        return prices
+
     appids = ','.join(apps)
     print('Apps to change -', appids)
 
@@ -39,15 +44,17 @@ def fetch_prices(apps, regions=supported_regions, delay=delay):
     return prices
 
 
-# make db-ready collection from steam input
 def parse_prices(prices, apps):
-    parsed = []
+    # make db-ready collection from steam input
+    parsed = {}
+    for appid in apps:
+        parsed[appid] = []
 
     for region_price in prices:
         for appid in apps:
             price = PriceParser.from_steam(region_price, appid)
             if price is not None:
-                parsed.append(price)
+                parsed[appid].append(price)
 
     return parsed
 

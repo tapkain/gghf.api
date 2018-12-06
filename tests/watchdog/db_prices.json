@@ -1,34 +1,38 @@
-[
-    {
-        "region":"US",
-        "currency":"USD",
-        "initial":1499,
-        "final":1499,
-        "discount":0,
-        "store": "steam"
-    },
-    {
-        "region":"US",
-        "currency":"USD",
-        "initial":1999,
-        "final":1999,
-        "discount":0,
-        "store": "steam"
-    },
-    {
-        "region": "AR",
-        "currency":"ARS",
-        "initial":17999,
-        "final":17999,
-        "discount":0,
-        "store": "steam"
-    },
-    {
-        "region": "AR",
-        "currency":"ARS",
-        "initial":22499,
-        "final":22499,
-        "discount":0,
-        "store": "steam"
-    }
-]
+{
+    "730":[
+       {
+          "region":"US",
+          "currency":"USD",
+          "initial":1499,
+          "final":1499,
+          "discount":0,
+          "store":"steam"
+       },
+       {
+          "region":"AR",
+          "currency":"ARS",
+          "initial":17999,
+          "final":17999,
+          "discount":0,
+          "store":"steam"
+       }
+    ],
+    "65540":[
+       {
+          "region":"US",
+          "currency":"USD",
+          "initial":1999,
+          "final":1999,
+          "discount":0,
+          "store":"steam"
+       },
+       {
+          "region":"AR",
+          "currency":"ARS",
+          "initial":22499,
+          "final":22499,
+          "discount":0,
+          "store":"steam"
+       }
+    ]
+ }

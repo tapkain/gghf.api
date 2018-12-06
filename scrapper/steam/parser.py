@@ -5,7 +5,7 @@ import time
 class GameParser:
     @staticmethod
     def from_steam(payload, appid):
-        payload = payload[appid]
+        payload = payload[str(appid)]
 
         if not payload['success']:
             return None

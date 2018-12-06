@@ -21,8 +21,9 @@ def test_parse_prices():
             db_prices = json.loads(db.read())
             assert len(parsed) == len(db_prices)
 
-            for p in zip(parsed, db_prices):
+            for p in zip(parsed['730'], db_prices['730']):
                 assert p[0]['store'] == p[1]['store']
                 assert p[0]['region'] == p[1]['region']
                 assert p[0]['initial'] == p[1]['initial']
                 assert p[0]['currency'] == p[1]['currency']
+
