@@ -1,31 +1,16 @@
 import requests
 import json
 import time
-from scrapper.steam import GameParser
+import gghf.parser.steam.game
+import gghf.repository.games.update
+import gghf.repository
 import datetime
-from pymongo import MongoClient, UpdateOne
 import watchdog.steamdog
-from config import Config
-
-mongo = MongoClient(Config.MONGODB_URI)
-db_name = Config.MONGODB_DATABASE
-
-
-def make_update_operation(game, prices):
-    game['price_latest'] = {'steam': prices}
-    return UpdateOne({'appid': game['appid']}, {'$set': game}, upsert=True)
-
-
-def bulk_update(updates):
-    try:
-        mongo[db_name].desktop_games.bulk_write(updates)
-    except Exception as ex:
-        print('Bulk update error', ex)
 
 
 def parse_game(game, appid):
     try:
-        return GameParser.from_steam(game, appid)
+        return gghf.parser.steam.game.from_steam(game, appid)
     except Exception as ex:
         now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         error_filename = '{0}_steam_info.txt'.format(now)
@@ -80,7 +65,7 @@ def fetch_games_info(chunk, delay):
         # not relevant to fetch prices for other countries
         if fetched[appid]['data'].get('price_overview', None) is None:
             print('App probably is free, skipping price fetch', appid)
-            update_operations.append(make_update_operation(game, []))
+            update_operations.append(gghf.repository.games.update.make(game, []))
             time.sleep(delay)
             continue
 
@@ -103,15 +88,15 @@ def scrap(all_games):
 
         print('Fetching prices for appids')
         appids = list(map(lambda x: str(x['appid']), games_prices))
-        prices = watchdog.steamdog.fetch_prices(appids)
+        prices = watchdog.steamdog.fetch_prices(appids, delay)
         prices = watchdog.steamdog.parse_prices(prices, appids)
 
         # add the fetched price to model
         for game in games_prices:
-            operation = make_update_operation(game, prices[str(game['appid'])])
+            operation = gghf.repository.games.update.make(game, prices[str(game['appid'])])
             update_operations.append(operation)
 
-        bulk_update(update_operations)
+        gghf.repository.bulk_update('desktop', update_operations)
         print('Updated chunk')
 
 
@@ -121,5 +106,4 @@ def main():
         all_games = requests.get(
             'http://api.steampowered.com/ISteamApps/GetAppList/v0002/?key=STEAMKEY&format=json').text
         all_games = json.loads(all_games)['applist']['apps']
-
         scrap(all_games)

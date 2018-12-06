@@ -26,7 +26,7 @@ def make_query(sort_by, search, genres, _type):
     return query
 
 
-def query_games(sort_by, search, genres, _type, limit, offset, region, platform, store):
+def get_games(sort_by, search, genres, _type, limit, offset, region, platform, store):
     query = make_query(sort_by, search, genres, _type)
     found = db(platform).find(query['find']).sort(query['sort']).limit(limit).skip(offset)
 

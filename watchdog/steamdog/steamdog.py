@@ -1,8 +1,7 @@
 # watchdog for steam, uses steam PICS update API
 # when app has received updates, fetch price and news for the app
 
-from watchdog.steamdog.parser import PriceParser
-from pymongo import UpdateOne
+import gghf.parser.steam.price
 import requests
 from steam.enums import EResult
 from steam.client import SteamClient
@@ -20,7 +19,7 @@ supported_regions = [
 ]
 
 
-def fetch_prices(apps, regions=supported_regions, delay=delay):
+def fetch_prices(apps, delay=delay, regions=supported_regions):
     # fetch prices for all apps from supported regions
     prices = []
 
@@ -52,7 +51,7 @@ def parse_prices(prices, apps):
 
     for region_price in prices:
         for appid in apps:
-            price = PriceParser.from_steam(region_price, appid)
+            price = gghf.parser.steam.price.from_steam(region_price, appid)
             if price is not None:
                 parsed[appid].append(price)
 

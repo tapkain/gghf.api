@@ -14,4 +14,10 @@ def db(platform):
         # return by now always desktop games
         return mongo[db_name].desktop_games
 
-from gghf.repository.query_games import query_games
+
+def bulk_update(platform, updates):
+    try:
+        db(platform).bulk_write(updates)
+    except Exception as ex:
+        print('Bulk update error', ex)
+        

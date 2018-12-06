@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-import gghf.repository
+import gghf.repository.games
 
 
 app = Flask(__name__)
@@ -22,7 +22,7 @@ def games():
     price = r.get('price')
     search = r.get('search')
 
-    result = gghf.repository.query_games(
+    result = gghf.repository.games.get_games(
         sort_by, search, genres, _type, limit, offset, region, platform, store
     )
     return jsonify(result)
