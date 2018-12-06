@@ -96,7 +96,7 @@ def scrap(all_games):
     # steam allows 200 request per 5 minutes, so delay 15 min between requests
     delay = 15
     # price overview appids count is max 100, so make an restriction
-    rate_limit = 1
+    rate_limit = 100
 
     for chunk in make_chunk(all_games, rate_limit):
         games_prices, update_operations = fetch_games_info(chunk, delay)
