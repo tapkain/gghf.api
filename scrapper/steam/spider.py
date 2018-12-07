@@ -63,6 +63,7 @@ def fetch_games_info(chunk, delay):
 
         # we assume if the game does not have US price, it is
         # not relevant to fetch prices for other countries
+        fetched = json.loads(fetched)
         if fetched[appid]['data'].get('price_overview', None) is None:
             print('App probably is free, skipping price fetch', appid)
             update_operations.append(gghf.repository.games.update.make(game, []))
