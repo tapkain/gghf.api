@@ -10,7 +10,7 @@ import watchdog.steamdog
 
 def parse_game(game, appid):
     try:
-        return gghf.parser.steam.game.from_steam(game, appid)
+        return gghf.parser.steam.game.from_steam(json.loads(game), appid)
     except Exception as ex:
         now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         error_filename = '{0}_steam_info.txt'.format(now)
@@ -18,7 +18,7 @@ def parse_game(game, appid):
             f.write(str(appid))
             f.write('\n')
             try:
-                f.write(json.dumps(game))
+                f.write(game)
             except Exception as ex:
                 f.write('Cannot parse game\n')
                 f.write(ex)
@@ -38,7 +38,7 @@ def fetch_games_info(chunk, delay):
         appid = str(game['appid'])
         url = 'https://store.steampowered.com/api/appdetails?appids={0}&cc=us'.format(
             appid)
-        fetched = requests.get(url).json()
+        fetched = requests.get(url).text
         print('Fetched', appid)
         game = parse_game(fetched, appid)
         print('Parsed', appid)
