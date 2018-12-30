@@ -2,7 +2,7 @@ from datetime import datetime, timedelta, timezone
 import dateutil.parser
 
 def from_playstation(payload):
-    # TODO Figure out how to get website, developers and categories
+    # TODO Figure out how to get developers and website
     return {
         'appid': payload.get('id', ''),
         'name': payload.get('name', ''),
@@ -13,7 +13,6 @@ def from_playstation(payload):
         'developers': None,
         'publishers': [payload.get('provider_name', None)],
         'platforms': platforms_from_playstation(payload),
-        'categories': None,
         'tags': tags_from_playstation(payload),
         'attachments': attachments_from_playstaion(payload),
         'release_date': release_date_from_playstation(payload)
