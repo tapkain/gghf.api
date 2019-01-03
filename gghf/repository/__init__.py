@@ -10,6 +10,8 @@ db_name = Config.MONGODB_DATABASE
 def db(platform):
     if platform == 'desktop':
         return mongo[db_name].desktop_games
+    if platform == 'playstation':
+        return mongo[db_name].playstation_games
     else:
         # return by now always desktop games
         return mongo[db_name].desktop_games
