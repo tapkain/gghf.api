@@ -4,7 +4,14 @@
 import gghf.parser.playstation.price
 import requests
 import json
+
+import logging
+import logging.handlers as handlers
 import time
+import logging.config
+
+logging.config.fileConfig('logging.conf')
+logger = logging.getLogger('logger')
 
 def fetch_prices(app, delay):
     prices = []
@@ -14,14 +21,18 @@ def fetch_prices(app, delay):
     
     # try to fetch prices for other regions
     for key, region in {'GB': european_region, 'HK': asian_region}.items():
-        search_result = requests.get('https://store.playstation.com/store/api/chihiro/00_09_000/tumbler/{0}/en/999/{1}?suggested_size=100&mode=game'.format(key, app['name'])).text
-        search_result = json.loads(search_result)['links']
+        try:
+            search_result = requests.get('https://store.playstation.com/store/api/chihiro/00_09_000/tumbler/{0}/en/999/{1}?suggested_size=100&mode=game'.format(key, app['name'])).text
+            search_result = json.loads(search_result)['links']
+        except Exception:
+            logger.exception('Cannot use search with params: {0}, {1}'.format(key, app['name']))
+            continue
         
         if search_result:
             game = next((x for x in list(search_result) if _compare(app, x)), None)
             
             if game is not None:
-                print(game['id'])
+                logger.info('Found game {0}'.format(game['id']))
                 prices.extend(_scrap_prices(game['id'], region))
 
     time.sleep(delay)
@@ -33,7 +44,11 @@ def parse_prices(prices, appid):
 
     for region_price in prices:
 
-        price = gghf.parser.playstation.price.from_playstation(region_price, appid)
+        try:
+            price = gghf.parser.playstation.price.from_playstation(region_price, appid)
+        except Exception:
+            logger.exception('Cannot parse price for game {0} in region {1}'.format(appid, region_price))
+        
         if price is not None:
             parsed.append(price)
 
@@ -42,11 +57,13 @@ def parse_prices(prices, appid):
 def _scrap_prices(appid, regions):
     prices = []
     for region in regions:
-        price_url = 'https://store.playstation.com/chihiro-api/viewfinder/{0}/{1}/999/{2}'.format(region[0], region[1], appid)
-        
-        print('GET', price_url)
-        price = requests.get(price_url).json()
-        
+        try:
+            price_url = 'https://store.playstation.com/chihiro-api/viewfinder/{0}/{1}/999/{2}'.format(region[0], region[1], appid)
+            price = requests.get(price_url).json()
+        except Exception:
+            logger.exception('Cannot fetch game {0} in region {1}/{2}'.format(appid, region[0], region[1]))
+            continue
+
         price['region'] = region[0]
         prices.append(price)
 
