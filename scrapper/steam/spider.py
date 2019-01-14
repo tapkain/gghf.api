@@ -66,7 +66,7 @@ def fetch_games_info(chunk, delay):
         fetched = json.loads(fetched)
         if fetched[appid]['data'].get('price_overview', None) is None:
             print('App probably is free, skipping price fetch', appid)
-            update_operations.append(gghf.repository.games.update.make(game, []))
+            update_operations.append(gghf.repository.games.update.make(game, [], 'steam'))
             time.sleep(delay)
             continue
 
@@ -94,7 +94,7 @@ def scrap(all_games):
 
         # add the fetched price to model
         for game in games_prices:
-            operation = gghf.repository.games.update.make(game, prices[str(game['appid'])])
+            operation = gghf.repository.games.update.make(game, prices[str(game['appid'])], 'steam')
             update_operations.append(operation)
 
         gghf.repository.bulk_update('desktop', update_operations)
